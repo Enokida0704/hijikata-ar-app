@@ -91,10 +91,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   setStartButtonState(false, "初期化中...");
 
-  scene.addEventListener("loaded", () => {
+  const markSceneReady = () => {
     sceneReady = true;
     setStartButtonState(true, "ARを開始");
-  });
+  };
+
+  if (scene.hasLoaded) {
+    markSceneReady();
+  } else {
+    scene.addEventListener("loaded", markSceneReady, { once: true });
+  }
 
   startButton.addEventListener("click", async () => {
     if (started) return;
