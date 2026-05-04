@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Bakumatsu Toast AR MVP</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <div class="overlay" id="overlay">
+      <div class="panel">
+        <h1>幕末乾杯 AR</h1>
+        <p>ビールラベルを写すと、ラベルの横の空間に幕末武士キャラクターが現れて乾杯します。</p>
+        <ol>
+          <li><code>assets/beer-label.mind</code> を作成して配置</li>
+          <li>「ARを開始」を押してカメラを許可</li>
+          <li>ラベルを明るい場所で正面気味に映す</li>
+        </ol>
+        <button id="startButton">ARを開始</button>
+        <p class="note">初版はプレースホルダー画像で構成しています。GLBや動画に差し替え可能です。</p>
+      </div>
+    </div>
+
+    <a-scene
+      mindar-image="imageTargetSrc: ./assets/beer-label.mind; autoStart: false; uiLoading: yes; uiScanning: yes; maxTrack: 1;"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      embedded
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+    >
+      <a-assets>
+        <img id="characterImg" src="./assets/hijikata-placeholder.png" />
+        <img id="beerImg" src="./assets/beer-mug.png" />
+        <img id="smokeImg" src="./assets/smoke.png" />
+        <img id="glowImg" src="./assets/glow.png" />
+        <img id="shadowImg" src="./assets/shadow.png" />
+      </a-assets>
+
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <a-entity id="targetRoot" mindar-image-target="targetIndex: 0">
+        <a-entity light="type: ambient; intensity: 1.15"></a-entity>
+        <a-entity light="type: directional; intensity: 0.8" position="0 1 1"></a-entity>
+
+        <a-entity id="spawnRoot" position="0.75 -0.25 0.25" scale="0.001 0.001 0.001" visible="false">
+          <a-image id="smoke" src="#smokeImg" width="1.5" height="1.1" position="0 -0.05 -0.06" opacity="0"></a-image>
+          <a-image id="glow" src="#glowImg" width="1.25" height="1.25" position="0 0.06 -0.05" opacity="0"></a-image>
+          <a-image id="shadow" src="#shadowImg" width="0.85" height="0.28" position="0 -0.63 -0.08" rotation="-90 0 0" opacity="0.65"></a-image>
+
+          <a-image id="character" src="#characterImg" width="0.82" height="1.28" position="0 0 0" opacity="0"></a-image>
+          <a-image id="beer" src="#beerImg" width="0.2" height="0.2" position="0.27 -0.03 0.02" opacity="0"></a-image>
+
+          <a-plane id="caption" width="1.15" height="0.18" color="#111111" material="opacity: 0.86" position="0 -0.83 0.04" visible="false">
+            <a-text value="一献、いかがかな。" align="center" color="#d8b45a" width="2.2" position="0 0 0.01"></a-text>
+          </a-plane>
+        </a-entity>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
