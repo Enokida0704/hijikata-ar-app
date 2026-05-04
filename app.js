@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let started = false;
   let active = false;
+  let sceneReady = false;
 
   const setVisiblePack = (visible) => {
     spawnRoot.setAttribute("visible", visible);
@@ -64,9 +65,9 @@ document.addEventListener("DOMContentLoaded", () => {
     shadow.setAttribute("animation__shadowpulse", "property: scale; from: 1 1 1; to: 1.06 1.06 1.06; dir: alternate; dur: 1200; easing: easeInOutSine; loop: true");
 
     setTimeout(() => {
-      spawnRoot.setAttribute("animation__bob", "property: position; from: 0.75 -0.25 0.25; to: 0.75 -0.22 0.25; dir: alternate; dur: 1200; easing: easeInOutSine; loop: true");
       beer.setAttribute("animation__toastmove", "property: position; from: 0.27 -0.03 0.02; to: 0.22 0.25 0.09; dur: 900; easing: easeInOutSine");
       beer.setAttribute("animation__toastrot", "property: rotation; from: 0 0 0; to: 0 0 18; dur: 900; easing: easeInOutSine");
+      spawnRoot.setAttribute("animation__bob", "property: position; from: 0.75 -0.25 0.25; to: 0.75 -0.22 0.25; dir: alternate; dur: 1200; easing: easeInOutSine; loop: true");
     }, 250);
 
     setTimeout(() => {
@@ -81,16 +82,51 @@ document.addEventListener("DOMContentLoaded", () => {
     setVisiblePack(false);
   };
 
+  const getMindarSystem = () => scene.systems?.["mindar-image-system"];
+
+  const setStartButtonState = (enabled, label) => {
+    startButton.disabled = !enabled;
+    if (label) startButton.textContent = label;
+  };
+
+  setStartButtonState(false, "初期化中...");
+
+  const markSceneReady = () => {
+    sceneReady = true;
+    setStartButtonState(true, "ARを開始");
+  };
+
+  if (scene.hasLoaded) {
+    markSceneReady();
+  } else {
+    scene.addEventListener("loaded", markSceneReady, { once: true });
+  }
+
   startButton.addEventListener("click", async () => {
     if (started) return;
-    const system = scene.systems["mindar-image-system"];
+    if (!sceneReady) {
+      alert("ARエンジンの初期化待ちです。数秒後にもう一度お試しください。");
+      return;
+    }
+
+    if (!window.isSecureContext && location.hostname !== "localhost") {
+      alert("HTTPSで開かれていないためカメラを利用できません。HTTPS環境で再度開いてください。");
+      return;
+    }
+
+    const system = getMindarSystem();
+    if (!system) {
+      alert("ARシステムの初期化に失敗しました。ページを再読み込みして再試行してください。");
+      return;
+    }
+
     try {
       await system.start();
       started = true;
       overlay.style.display = "none";
     } catch (error) {
       console.error(error);
-      alert("カメラを開始できませんでした。HTTPS環境（GitHub Pagesなど）で開いてください。");
+      alert("カメラを開始できませんでした。ブラウザのカメラ権限とHTTPS環境を確認してください。");
     }
   });
 
@@ -105,10 +141,16 @@ document.addEventListener("DOMContentLoaded", () => {
     stopSequence();
   });
 
+  scene.addEventListener("arError", (event) => {
+    console.error("MindAR error", event?.detail || event);
+    if (!started) return;
+    alert("ARの実行中にエラーが発生しました。ページを再読み込みしてください。");
+  });
+
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) return;
     if (started) {
-      const system = scene.systems["mindar-image-system"];
+      const system = getMindarSystem();
       if (system) system.stop();
       started = false;
       active = false;
