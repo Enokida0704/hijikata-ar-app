@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
     [
       [spawnRoot, "animation__spawn"],
       [spawnRoot, "animation__bob"],
+      [spawnRoot, "animation__breathe"],
       [character, "animation__fadein"],
       [beer, "animation__fadein"],
       [smoke, "animation__smokein"],
@@ -40,13 +41,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const resetPose = () => {
     clearAnimations();
-    spawnRoot.setAttribute("position", "0.75 -0.25 0.25");
+    spawnRoot.setAttribute("position", "0.72 -0.34 0.26");
     spawnRoot.setAttribute("scale", "0.001 0.001 0.001");
     character.setAttribute("opacity", 0);
     beer.setAttribute("opacity", 0);
     smoke.setAttribute("opacity", 0);
     glow.setAttribute("opacity", 0);
-    shadow.setAttribute("opacity", 0.65);
+    shadow.setAttribute("opacity", 0.72);
     beer.setAttribute("position", "0.27 -0.03 0.02");
     beer.setAttribute("rotation", "0 0 0");
     character.setAttribute("rotation", "0 0 0");
@@ -56,19 +57,20 @@ document.addEventListener("DOMContentLoaded", () => {
     resetPose();
     setVisiblePack(true);
 
-    spawnRoot.setAttribute("animation__spawn", "property: scale; from: 0.001 0.001 0.001; to: 0.6 0.6 0.6; dur: 420; easing: easeOutBack");
+    spawnRoot.setAttribute("animation__spawn", "property: scale; from: 0.001 0.001 0.001; to: 0.64 0.64 0.64; dur: 460; easing: easeOutBack");
     character.setAttribute("animation__fadein", "property: opacity; from: 0; to: 1; dur: 360; easing: easeOutQuad");
     beer.setAttribute("animation__fadein", "property: opacity; from: 0; to: 1; dur: 360; easing: easeOutQuad");
-    smoke.setAttribute("animation__smokein", "property: opacity; from: 0; to: 0.72; dur: 320; easing: easeOutQuad");
+    smoke.setAttribute("animation__smokein", "property: opacity; from: 0; to: 0.62; dur: 320; easing: easeOutQuad");
     smoke.setAttribute("animation__smokefloat", "property: position; from: 0 -0.08 -0.06; to: 0 0.03 -0.06; dur: 1200; easing: easeOutSine");
-    glow.setAttribute("animation__glowin", "property: opacity; from: 0; to: 0.82; dur: 450; easing: easeOutQuad");
-    shadow.setAttribute("animation__shadowpulse", "property: scale; from: 1 1 1; to: 1.06 1.06 1.06; dir: alternate; dur: 1200; easing: easeInOutSine; loop: true");
+    glow.setAttribute("animation__glowin", "property: opacity; from: 0; to: 0.65; dur: 450; easing: easeOutQuad");
+    shadow.setAttribute("animation__shadowpulse", "property: scale; from: 1 1 1; to: 1.08 1.08 1.08; dir: alternate; dur: 1350; easing: easeInOutSine; loop: true");
 
     setTimeout(() => {
       beer.setAttribute("animation__toastmove", "property: position; from: 0.27 -0.03 0.02; to: 0.22 0.25 0.09; dur: 900; easing: easeInOutSine");
       beer.setAttribute("animation__toastrot", "property: rotation; from: 0 0 0; to: 0 0 18; dur: 900; easing: easeInOutSine");
-      spawnRoot.setAttribute("animation__bob", "property: position; from: 0.75 -0.25 0.25; to: 0.75 -0.22 0.25; dir: alternate; dur: 1200; easing: easeInOutSine; loop: true");
-    }, 250);
+      spawnRoot.setAttribute("animation__bob", "property: position; from: 0.72 -0.34 0.26; to: 0.72 -0.31 0.26; dir: alternate; dur: 1300; easing: easeInOutSine; loop: true");
+      spawnRoot.setAttribute("animation__breathe", "property: scale; from: 0.64 0.64 0.64; to: 0.655 0.655 0.655; dir: alternate; dur: 1600; easing: easeInOutSine; loop: true");
+    }, 280);
 
     setTimeout(() => {
       beer.setAttribute("animation__drinkmove", "property: position; from: 0.22 0.25 0.09; to: 0.12 0.33 0.11; dir: alternate; dur: 600; loop: 2; easing: easeInOutSine");
