@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const glow = document.getElementById("glow");
   const shadow = document.getElementById("shadow");
   const caption = document.getElementById("caption");
+  const hijikataVideo = document.getElementById("hijikataVideo");
 
   let started = false;
   let active = false;
@@ -57,6 +58,12 @@ document.addEventListener("DOMContentLoaded", () => {
     resetPose();
     setVisiblePack(true);
 
+    if (hijikataVideo) {
+      hijikataVideo.currentTime = 0;
+      const playPromise = hijikataVideo.play();
+      if (playPromise?.catch) playPromise.catch(() => {});
+    }
+
     spawnRoot.setAttribute("animation__spawn", "property: scale; from: 0.001 0.001 0.001; to: 0.64 0.64 0.64; dur: 460; easing: easeOutBack");
     character.setAttribute("animation__fadein", "property: opacity; from: 0; to: 1; dur: 360; easing: easeOutQuad");
     beer.setAttribute("animation__fadein", "property: opacity; from: 0; to: 1; dur: 360; easing: easeOutQuad");
@@ -80,6 +87,10 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const stopSequence = () => {
+    if (hijikataVideo) {
+      hijikataVideo.pause();
+      hijikataVideo.currentTime = 0;
+    }
     resetPose();
     setVisiblePack(false);
   };
