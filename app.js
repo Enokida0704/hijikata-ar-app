@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let started = false;
   let active = false;
   let sceneReady = false;
+  let needsRestart = false;
 
   const setVisiblePack = (visible) => {
     spawnRoot.setAttribute("visible", visible);
@@ -113,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
     scene.addEventListener("loaded", markSceneReady, { once: true });
   }
 
-  startButton.addEventListener("click", () => {
+  startButton.addEventListener("click", async () => {
     if (!sceneReady) {
       setDebug("blocked: scene not ready");
       alert("ARエンジンの初期化待ちです。数秒後にもう一度お試しください。");
@@ -126,8 +127,28 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    if (needsRestart) {
+      const system = getMindarSystem();
+      if (!system?.start) {
+        setDebug("blocked: restart requested but MindAR system missing");
+        alert("ARの再開に失敗しました。ページを再読み込みしてください。");
+        return;
+      }
+
+      try {
+        await system.start();
+        needsRestart = false;
+        setDebug("MindAR restarted after background stop");
+      } catch (error) {
+        console.error("MindAR restart failed", error);
+        setDebug("restart failed");
+        alert("ARの再開に失敗しました。ページを再読み込みしてください。");
+        return;
+      }
+    }
+
     started = true;
-    setDebug("overlay hidden (MindAR auto start)");
+    setDebug("overlay hidden");
     overlay.style.display = "none";
     overlay.classList.add("overlay-hidden-debug");
   });
@@ -154,7 +175,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!document.hidden) return;
     if (started) {
       const system = getMindarSystem();
-      if (system) system.stop();
+      if (system) {
+        system.stop();
+        needsRestart = true;
+      }
       started = false;
       active = false;
       stopSequence();
