@@ -98,7 +98,8 @@ document.addEventListener("DOMContentLoaded", () => {
     scene.addEventListener("loaded", markSceneReady, { once: true });
   }
 
-  startButton.addEventListener("click", () => {
+  startButton.addEventListener("click", async () => {
+    if (started) return;
     if (!sceneReady) {
       setDebug("blocked: scene not ready");
       alert("ARエンジンの初期化待ちです。数秒後にもう一度お試しください。");
@@ -111,10 +112,24 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    started = true;
-    setDebug("overlay hidden (MindAR auto start)");
-    overlay.style.display = "none";
-    overlay.classList.add("overlay-hidden-debug");
+    const system = getMindarSystem();
+    if (!system) {
+      setDebug("blocked: mindar system missing");
+      alert("ARシステムの初期化に失敗しました。ページを再読み込みして再試行してください。");
+      return;
+    }
+
+    try {
+      await system.start();
+      started = true;
+      setDebug("system.start() success / hiding overlay");
+      overlay.style.display = "none";
+      overlay.classList.add("overlay-hidden-debug");
+    } catch (error) {
+      console.error(error);
+      setDebug(`system.start() failed: ${error?.name || "unknown"}`);
+      alert("カメラを開始できませんでした。ブラウザのカメラ権限とHTTPS環境を確認してください。");
+    }
   });
 
   targetRoot.addEventListener("targetFound", () => {
