@@ -29,11 +29,6 @@ document.addEventListener("DOMContentLoaded", () => {
       [beer, "animation__fadein"],
       [smoke, "animation__smokein"],
       [glow, "animation__glowin"],
-      [beer, "animation__toastmove"],
-      [beer, "animation__toastrot"],
-      [beer, "animation__drinkmove"],
-      [beer, "animation__drinkrot"],
-      [character, "animation__nod"],
     ].forEach(([el, name]) => el.removeAttribute(name));
   };
 
@@ -66,16 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
     beer.setAttribute("animation__fadein", "property: opacity; from: 0; to: 1; dur: 360; easing: easeOutQuad");
     smoke.setAttribute("animation__smokein", "property: opacity; from: 0; to: 0.62; dur: 320; easing: easeOutQuad");
     glow.setAttribute("animation__glowin", "property: opacity; from: 0; to: 0.65; dur: 450; easing: easeOutQuad");
-    setTimeout(() => {
-      beer.setAttribute("animation__toastmove", "property: position; from: 0.27 -0.03 0.02; to: 0.22 0.25 0.09; dur: 900; easing: easeInOutSine");
-      beer.setAttribute("animation__toastrot", "property: rotation; from: 0 0 0; to: 0 0 18; dur: 900; easing: easeInOutSine");
-    }, 280);
-
-    setTimeout(() => {
-      beer.setAttribute("animation__drinkmove", "property: position; from: 0.22 0.25 0.09; to: 0.12 0.33 0.11; dir: alternate; dur: 600; loop: 2; easing: easeInOutSine");
-      beer.setAttribute("animation__drinkrot", "property: rotation; from: 0 0 18; to: 0 0 34; dir: alternate; dur: 600; loop: 2; easing: easeInOutSine");
-      character.setAttribute("animation__nod", "property: rotation; from: 0 0 0; to: 0 0 -3; dir: alternate; dur: 600; loop: 2; easing: easeInOutSine");
-    }, 1250);
   };
 
   const stopSequence = () => {
