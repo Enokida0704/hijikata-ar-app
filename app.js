@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const shadow = document.getElementById("shadow");
   const caption = document.getElementById("caption");
   const hijikataVideo = document.getElementById("hijikataVideo");
+  const debugStatus = document.getElementById("debugStatus");
 
   let started = false;
   let active = false;
@@ -93,11 +94,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (label) startButton.textContent = label;
   };
 
+  const setDebug = (message) => {
+    console.log("[AR DEBUG]", message);
+    if (debugStatus) debugStatus.textContent = `debug: ${message}`;
+  };
+
   setStartButtonState(false, "初期化中...");
 
   const markSceneReady = () => {
     sceneReady = true;
     setStartButtonState(true, "ARを開始");
+    setDebug("scene loaded / button enabled");
   };
 
   if (scene.hasLoaded) {
@@ -109,17 +116,20 @@ document.addEventListener("DOMContentLoaded", () => {
   startButton.addEventListener("click", async () => {
     if (started) return;
     if (!sceneReady) {
+      setDebug("blocked: scene not ready");
       alert("ARエンジンの初期化待ちです。数秒後にもう一度お試しください。");
       return;
     }
 
     if (!window.isSecureContext && location.hostname !== "localhost") {
+      setDebug("blocked: insecure context");
       alert("HTTPSで開かれていないためカメラを利用できません。HTTPS環境で再度開いてください。");
       return;
     }
 
     const system = getMindarSystem();
     if (!system) {
+      setDebug("blocked: mindar system missing");
       alert("ARシステムの初期化に失敗しました。ページを再読み込みして再試行してください。");
       return;
     }
@@ -127,9 +137,12 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await system.start();
       started = true;
+      setDebug("system.start() success / hiding overlay");
       overlay.style.display = "none";
+      overlay.classList.add("overlay-hidden-debug");
     } catch (error) {
       console.error(error);
+      setDebug(`system.start() failed: ${error?.name || "unknown"}`);
       alert("カメラを開始できませんでした。ブラウザのカメラ権限とHTTPS環境を確認してください。");
     }
   });
@@ -147,6 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   scene.addEventListener("arError", (event) => {
     console.error("MindAR error", event?.detail || event);
+    setDebug("arError event fired");
     if (!started) return;
     alert("ARの実行中にエラーが発生しました。ページを再読み込みしてください。");
   });
@@ -160,6 +174,9 @@ document.addEventListener("DOMContentLoaded", () => {
       active = false;
       stopSequence();
       overlay.style.display = "grid";
+      setDebug("page hidden: system stopped / overlay shown");
     }
   });
+
+  setDebug("init complete");
 });
