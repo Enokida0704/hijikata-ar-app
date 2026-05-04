@@ -26,9 +26,10 @@
     </div>
 
     <a-scene
-      mindar-image="imageTargetSrc: ./assets/beer-label.mind; autoStart: false; uiLoading: no; uiScanning: no; maxTrack: 1;"
+      mindar-image="imageTargetSrc: ./assets/beer-label.mind; uiLoading: no; uiScanning: no; maxTrack: 1;"
       color-space="sRGB"
-      renderer="colorManagement: true; physicallyCorrectLights: true"
+      renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true"
+      background="transparent"
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
     >
