@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const targetRoot = document.getElementById("targetRoot");
   const spawnRoot = document.getElementById("spawnRoot");
   const character = document.getElementById("character");
+  const beer = document.getElementById("beer");
   const smoke = document.getElementById("smoke");
   const glow = document.getElementById("glow");
   const shadow = document.getElementById("shadow");
@@ -25,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
     [
       [spawnRoot, "animation__spawn"],
       [character, "animation__fadein"],
+      [beer, "animation__fadein"],
       [smoke, "animation__smokein"],
       [glow, "animation__glowin"],
     ].forEach(([el, name]) => el.removeAttribute(name));
@@ -35,9 +37,12 @@ document.addEventListener("DOMContentLoaded", () => {
     spawnRoot.setAttribute("position", "0.0 -0.2 0.18");
     spawnRoot.setAttribute("scale", "0.001 0.001 0.001");
     character.setAttribute("opacity", 0);
+    beer.setAttribute("opacity", 0);
     smoke.setAttribute("opacity", 0);
     glow.setAttribute("opacity", 0);
     shadow.setAttribute("opacity", 0.72);
+    beer.setAttribute("position", "0.27 -0.03 0.02");
+    beer.setAttribute("rotation", "0 0 0");
     character.setAttribute("rotation", "0 0 0");
   };
 
@@ -53,6 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     spawnRoot.setAttribute("animation__spawn", "property: scale; from: 0.001 0.001 0.001; to: 0.68 0.68 0.68; dur: 460; easing: easeOutBack");
     character.setAttribute("animation__fadein", "property: opacity; from: 0; to: 1; dur: 360; easing: easeOutQuad");
+    beer.setAttribute("animation__fadein", "property: opacity; from: 0; to: 1; dur: 360; easing: easeOutQuad");
     smoke.setAttribute("animation__smokein", "property: opacity; from: 0; to: 0.62; dur: 320; easing: easeOutQuad");
     glow.setAttribute("animation__glowin", "property: opacity; from: 0; to: 0.65; dur: 450; easing: easeOutQuad");
   };

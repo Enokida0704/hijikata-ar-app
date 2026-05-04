@@ -23,7 +23,7 @@
     </div>
 
     <a-scene
-      mindar-image="imageTargetSrc: ./assets/beer-label.mind; uiLoading: no; uiScanning: no; maxTrack: 1; filterMinCF: 0.0001; filterBeta: 0.001;"
+      mindar-image="imageTargetSrc: ./assets/beer-label.mind; uiLoading: no; uiScanning: no; maxTrack: 1;"
       color-space="sRGB"
       renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true"
       background="transparent"
@@ -32,6 +32,7 @@
     >
       <a-assets>
         <video id="hijikataVideo" src="./assets/hijikata_beer.mp4" loop muted playsinline webkit-playsinline crossorigin="anonymous"></video>
+        <img id="beerImg" src="./assets/beer-mug.png" />
         <img id="smokeImg" src="./assets/smoke.png" />
         <img id="glowImg" src="./assets/glow.png" />
         <img id="shadowImg" src="./assets/shadow.png" />
@@ -49,6 +50,7 @@
           <a-image id="shadow" src="#shadowImg" width="0.85" height="0.28" position="0 -0.63 -0.08" rotation="-90 0 0" opacity="0.65"></a-image>
 
           <a-video id="character" src="#hijikataVideo" width="0.82" height="1.28" position="0 0 0" opacity="0"></a-video>
+          <a-image id="beer" src="#beerImg" width="0.2" height="0.2" position="0.27 -0.03 0.02" opacity="0"></a-image>
 
           <a-plane id="caption" width="1.15" height="0.18" color="#111111" material="opacity: 0.86" position="0 -0.83 0.04" visible="false">
             <a-text value="一献、いかがかな。" align="center" color="#d8b45a" width="2.2" position="0 0 0.01"></a-text>
