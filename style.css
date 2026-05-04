@@ -17,8 +17,12 @@ html, body {
   display: grid;
   place-items: center;
   padding: 20px;
-  background: #000;
+  background: rgba(220, 20, 60, 0.88);
   z-index: 20;
+}
+
+.overlay.overlay-hidden-debug {
+  outline: 4px solid #00e676;
 }
 
 .panel {
@@ -67,6 +71,18 @@ button {
   margin-bottom: 0;
   font-size: 13px;
   opacity: 0.82;
+}
+
+.debug-status {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  word-break: break-word;
 }
 
 .a-enter-vr-button {
