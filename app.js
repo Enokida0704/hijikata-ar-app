@@ -1,3 +1,76 @@
+AFRAME.registerShader("chromakey", {
+  schema: {
+    src: { type: "map" },
+    color: { type: "color", default: "#00ff00" },
+    similarity: { type: "number", default: 0.28 },
+    smoothness: { type: "number", default: 0.08 },
+    spill: { type: "number", default: 0.12 },
+    opacity: { type: "number", default: 1.0 },
+  },
+
+  init(data) {
+    this.material = new THREE.ShaderMaterial({
+      uniforms: {
+        map: { value: data.src },
+        keyColor: { value: new THREE.Color(data.color) },
+        similarity: { value: data.similarity },
+        smoothness: { value: data.smoothness },
+        spill: { value: data.spill },
+        opacity: { value: data.opacity },
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D map;
+        uniform vec3 keyColor;
+        uniform float similarity;
+        uniform float smoothness;
+        uniform float spill;
+        uniform float opacity;
+        varying vec2 vUv;
+
+        vec2 rgb2uv(vec3 rgb) {
+          return vec2(
+            rgb.r * -0.169 + rgb.g * -0.331 + rgb.b * 0.5 + 0.5,
+            rgb.r * 0.5 + rgb.g * -0.419 + rgb.b * -0.081 + 0.5
+          );
+        }
+
+        void main() {
+          vec4 videoColor = texture2D(map, vUv);
+          vec2 videoUV = rgb2uv(videoColor.rgb);
+          vec2 keyUV = rgb2uv(keyColor);
+          float distanceToKey = distance(videoUV, keyUV);
+
+          float alpha = smoothstep(similarity, similarity + smoothness, distanceToKey);
+
+          float greenAmount = max(videoColor.g - max(videoColor.r, videoColor.b), 0.0);
+          vec3 desaturated = mix(videoColor.rgb, vec3(videoColor.r * 0.5 + videoColor.b * 0.5), greenAmount * spill);
+
+          gl_FragColor = vec4(desaturated, videoColor.a * alpha * opacity);
+        }
+      `,
+      transparent: true,
+      side: THREE.DoubleSide,
+    });
+  },
+
+  update(data) {
+    if (!this.material) return;
+    this.material.uniforms.map.value = data.src;
+    this.material.uniforms.keyColor.value.set(data.color);
+    this.material.uniforms.similarity.value = data.similarity;
+    this.material.uniforms.smoothness.value = data.smoothness;
+    this.material.uniforms.spill.value = data.spill;
+    this.material.uniforms.opacity.value = data.opacity;
+  },
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   const overlay = document.getElementById("overlay");
   const startButton = document.getElementById("startButton");
