@@ -2,9 +2,9 @@ AFRAME.registerShader("chromakey", {
   schema: {
     src: { type: "map", is: "uniform" },
     color: { type: "color", default: "#1f6f50" },
-    similarity: { type: "number", default: 0.14 },
-    smoothness: { type: "number", default: 0.05 },
-    spill: { type: "number", default: 0.12 },
+    similarity: { type: "number", default: 0.16 },
+    smoothness: { type: "number", default: 0.06 },
+    spill: { type: "number", default: 0.18 },
   },
 
   vertexShader: [
@@ -36,8 +36,8 @@ AFRAME.registerShader("chromakey", {
     "  float alpha = smoothstep(similarity, similarity + smoothness, chromaDistance);",
     "  float keyLuma = dot(color, vec3(0.299, 0.587, 0.114));",
     "  float videoLuma = dot(videoColor.rgb, vec3(0.299, 0.587, 0.114));",
-    "  float lumaProtect = smoothstep(0.02, 0.2, abs(videoLuma - keyLuma));",
-    "  alpha = max(alpha, lumaProtect);",
+    "  float lumaProtect = smoothstep(0.10, 0.40, abs(videoLuma - keyLuma));",
+    "  alpha = max(alpha, mix(alpha, lumaProtect, 0.65));",
     "  vec3 despilled = videoColor.rgb;",
     "  float spillAmount = (1.0 - alpha) * spill;",
     "  despilled.g = mix(despilled.g, (despilled.r + despilled.b) * 0.5, spillAmount);",
