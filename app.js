@@ -1,6 +1,6 @@
 AFRAME.registerShader("chromakey", {
   schema: {
-    src: { type: "map" },
+    src: { type: "map", is: "uniform" },
     color: { type: "color", default: "#00ff00" },
     similarity: { type: "number", default: 0.32 },
     smoothness: { type: "number", default: 0.08 },
@@ -15,6 +15,7 @@ AFRAME.registerShader("chromakey", {
   ].join("\n"),
 
   fragmentShader: [
+    "precision mediump float;",
     "uniform sampler2D src;",
     "uniform vec3 color;",
     "uniform float similarity;",
@@ -30,6 +31,7 @@ AFRAME.registerShader("chromakey", {
 });
 
 // chromakey / similarity / smoothness: 素材ごとに値を調整して境界品質を最適化する。
+// 例: color は #00ff00 のような CSS カラー形式で指定する。
 
 document.addEventListener("DOMContentLoaded", () => {
   const overlay = document.getElementById("overlay");
