@@ -1,3 +1,76 @@
+AFRAME.registerShader("chromakey", {
+  schema: {
+    src: { type: "map" },
+    color: { type: "color", default: "#00ff00" },
+    similarity: { type: "number", default: 0.28 },
+    smoothness: { type: "number", default: 0.08 },
+    spill: { type: "number", default: 0.12 },
+    opacity: { type: "number", default: 1.0 },
+  },
+
+  init(data) {
+    this.material = new THREE.ShaderMaterial({
+      uniforms: {
+        map: { value: data.src },
+        keyColor: { value: new THREE.Color(data.color) },
+        similarity: { value: data.similarity },
+        smoothness: { value: data.smoothness },
+        spill: { value: data.spill },
+        opacity: { value: data.opacity },
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D map;
+        uniform vec3 keyColor;
+        uniform float similarity;
+        uniform float smoothness;
+        uniform float spill;
+        uniform float opacity;
+        varying vec2 vUv;
+
+        vec2 rgb2uv(vec3 rgb) {
+          return vec2(
+            rgb.r * -0.169 + rgb.g * -0.331 + rgb.b * 0.5 + 0.5,
+            rgb.r * 0.5 + rgb.g * -0.419 + rgb.b * -0.081 + 0.5
+          );
+        }
+
+        void main() {
+          vec4 videoColor = texture2D(map, vUv);
+          vec2 videoUV = rgb2uv(videoColor.rgb);
+          vec2 keyUV = rgb2uv(keyColor);
+          float distanceToKey = distance(videoUV, keyUV);
+
+          float alpha = smoothstep(similarity, similarity + smoothness, distanceToKey);
+
+          float greenAmount = max(videoColor.g - max(videoColor.r, videoColor.b), 0.0);
+          vec3 desaturated = mix(videoColor.rgb, vec3(videoColor.r * 0.5 + videoColor.b * 0.5), greenAmount * spill);
+
+          gl_FragColor = vec4(desaturated, videoColor.a * alpha * opacity);
+        }
+      `,
+      transparent: true,
+      side: THREE.DoubleSide,
+    });
+  },
+
+  update(data) {
+    if (!this.material) return;
+    this.material.uniforms.map.value = data.src;
+    this.material.uniforms.keyColor.value.set(data.color);
+    this.material.uniforms.similarity.value = data.similarity;
+    this.material.uniforms.smoothness.value = data.smoothness;
+    this.material.uniforms.spill.value = data.spill;
+    this.material.uniforms.opacity.value = data.opacity;
+  },
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   const overlay = document.getElementById("overlay");
   const startButton = document.getElementById("startButton");
@@ -31,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearAnimations();
     spawnRoot.setAttribute("position", "0.0 -0.2 0.18");
     spawnRoot.setAttribute("scale", "0.001 0.001 0.001");
-    character.setAttribute("opacity", 0);
+    character.setAttribute("material", "opacity", 0);
     smoke.setAttribute("opacity", 0);
     glow.setAttribute("opacity", 0);
     character.setAttribute("rotation", "0 0 0");
@@ -48,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     spawnRoot.setAttribute("animation__spawn", "property: scale; from: 0.001 0.001 0.001; to: 0.68 0.68 0.68; dur: 460; easing: easeOutBack");
-    character.setAttribute("animation__fadein", "property: opacity; from: 0; to: 1; dur: 360; easing: easeOutQuad");
+    character.setAttribute("animation__fadein", "property: material.opacity; from: 0; to: 1; dur: 360; easing: easeOutQuad");
     smoke.setAttribute("animation__smokein", "property: opacity; from: 0; to: 0.62; dur: 320; easing: easeOutQuad");
     glow.setAttribute("animation__glowin", "property: opacity; from: 0; to: 0.65; dur: 450; easing: easeOutQuad");
   };
@@ -73,6 +146,33 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("[AR DEBUG]", message);
     if (debugStatus) debugStatus.textContent = `debug: ${message}`;
   };
+
+
+  const setupVideoFallback = () => {
+    if (!hijikataVideo) return;
+    const fallbackSrc = "./assets/hijikata_beer.mp4";
+
+    const applyFallback = (reason) => {
+      if (hijikataVideo.getAttribute("src") === fallbackSrc) return;
+      console.warn("[AR DEBUG] video fallback to hijikata_beer.mp4:", reason);
+      setDebug(`video fallback: ${reason}`);
+      hijikataVideo.pause();
+      hijikataVideo.setAttribute("src", fallbackSrc);
+      hijikataVideo.load();
+    };
+
+    hijikataVideo.addEventListener("error", () => {
+      const mediaError = hijikataVideo.error;
+      const reason = mediaError ? `media error code ${mediaError.code}` : "unknown decode error";
+      applyFallback(reason);
+    });
+
+    hijikataVideo.addEventListener("loadedmetadata", () => {
+      setDebug(`video loaded: ${hijikataVideo.videoWidth}x${hijikataVideo.videoHeight}`);
+    }, { once: true });
+  };
+
+  setupVideoFallback();
 
   setStartButtonState(false, "初期化中...");
 
