@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const smoke = document.getElementById("smoke");
   const glow = document.getElementById("glow");
   const shadow = document.getElementById("shadow");
-  const caption = document.getElementById("caption");
   const hijikataVideo = document.getElementById("hijikataVideo");
   const debugStatus = document.getElementById("debugStatus");
 
@@ -18,7 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const setVisiblePack = (visible) => {
     spawnRoot.setAttribute("visible", visible);
-    caption.setAttribute("visible", visible);
   };
 
   const clearAnimations = () => {
