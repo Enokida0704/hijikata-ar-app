@@ -1,3 +1,38 @@
+AFRAME.registerShader("chromakey", {
+  schema: {
+    src: { type: "map", is: "uniform" },
+    color: { type: "color", default: "#00ff00" },
+    similarity: { type: "number", default: 0.32 },
+    smoothness: { type: "number", default: 0.08 },
+  },
+
+  vertexShader: [
+    "varying vec2 vUV;",
+    "void main(void) {",
+    "  vUV = uv;",
+    "  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);",
+    "}",
+  ].join("\n"),
+
+  fragmentShader: [
+    "precision mediump float;",
+    "uniform sampler2D src;",
+    "uniform vec3 color;",
+    "uniform float similarity;",
+    "uniform float smoothness;",
+    "varying vec2 vUV;",
+    "void main(void) {",
+    "  vec4 videoColor = texture2D(src, vUV);",
+    "  float colorDistance = distance(videoColor.rgb, color);",
+    "  float alpha = smoothstep(similarity, similarity + smoothness, colorDistance);",
+    "  gl_FragColor = vec4(videoColor.rgb, videoColor.a * alpha);",
+    "}",
+  ].join("\n"),
+});
+
+// chromakey / similarity / smoothness: 素材ごとに値を調整して境界品質を最適化する。
+// 例: color は #00ff00 のような CSS カラー形式で指定する。
+
 document.addEventListener("DOMContentLoaded", () => {
   const overlay = document.getElementById("overlay");
   const startButton = document.getElementById("startButton");
