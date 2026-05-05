@@ -1,9 +1,10 @@
 AFRAME.registerShader("chromakey", {
   schema: {
     src: { type: "map", is: "uniform" },
-    color: { type: "color", default: "#00ff00" },
-    similarity: { type: "number", default: 0.32 },
-    smoothness: { type: "number", default: 0.08 },
+    color: { type: "color", default: "#1f6f50" },
+    similarity: { type: "number", default: 0.14 },
+    smoothness: { type: "number", default: 0.05 },
+    spill: { type: "number", default: 0.12 },
   },
 
   vertexShader: [
@@ -20,18 +21,33 @@ AFRAME.registerShader("chromakey", {
     "uniform vec3 color;",
     "uniform float similarity;",
     "uniform float smoothness;",
+    "uniform float spill;",
     "varying vec2 vUV;",
+    "vec2 rgbToCbCr(vec3 c) {",
+    "  float cb = -0.168736 * c.r - 0.331264 * c.g + 0.5 * c.b;",
+    "  float cr =  0.5 * c.r - 0.418688 * c.g - 0.081312 * c.b;",
+    "  return vec2(cb, cr);",
+    "}",
     "void main(void) {",
     "  vec4 videoColor = texture2D(src, vUV);",
-    "  float colorDistance = distance(videoColor.rgb, color);",
-    "  float alpha = smoothstep(similarity, similarity + smoothness, colorDistance);",
-    "  gl_FragColor = vec4(videoColor.rgb, videoColor.a * alpha);",
+    "  vec2 videoCbCr = rgbToCbCr(videoColor.rgb);",
+    "  vec2 keyCbCr = rgbToCbCr(color);",
+    "  float chromaDistance = distance(videoCbCr, keyCbCr);",
+    "  float alpha = smoothstep(similarity, similarity + smoothness, chromaDistance);",
+    "  float keyLuma = dot(color, vec3(0.299, 0.587, 0.114));",
+    "  float videoLuma = dot(videoColor.rgb, vec3(0.299, 0.587, 0.114));",
+    "  float lumaProtect = smoothstep(0.02, 0.2, abs(videoLuma - keyLuma));",
+    "  alpha = max(alpha, lumaProtect);",
+    "  vec3 despilled = videoColor.rgb;",
+    "  float spillAmount = (1.0 - alpha) * spill;",
+    "  despilled.g = mix(despilled.g, (despilled.r + despilled.b) * 0.5, spillAmount);",
+    "  gl_FragColor = vec4(despilled, videoColor.a * alpha);",
     "}",
   ].join("\n"),
 });
 
 // chromakey / similarity / smoothness: 素材ごとに値を調整して境界品質を最適化する。
-// 例: color は #00ff00 のような CSS カラー形式で指定する。
+// 例: color は #1f6f50 のように素材の実背景色へ合わせて指定する。
 
 document.addEventListener("DOMContentLoaded", () => {
   const overlay = document.getElementById("overlay");
