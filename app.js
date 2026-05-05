@@ -7,8 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const character = document.getElementById("character");
   const smoke = document.getElementById("smoke");
   const glow = document.getElementById("glow");
-  const shadow = document.getElementById("shadow");
-  const caption = document.getElementById("caption");
   const hijikataVideo = document.getElementById("hijikataVideo");
   const debugStatus = document.getElementById("debugStatus");
 
@@ -18,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const setVisiblePack = (visible) => {
     spawnRoot.setAttribute("visible", visible);
-    caption.setAttribute("visible", visible);
   };
 
   const clearAnimations = () => {
@@ -37,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
     character.setAttribute("opacity", 0);
     smoke.setAttribute("opacity", 0);
     glow.setAttribute("opacity", 0);
-    shadow.setAttribute("opacity", 0.72);
     character.setAttribute("rotation", "0 0 0");
   };
 
