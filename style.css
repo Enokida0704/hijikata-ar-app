@@ -73,16 +73,21 @@ button {
   opacity: 0.82;
 }
 
-.debug-status {
-  margin-top: 10px;
-  font-size: 12px;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 8px;
-  padding: 8px 10px;
+.app-version {
+  position: fixed;
+  right: calc(12px + env(safe-area-inset-right));
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 30;
+  color: rgba(245, 242, 233, 0.78);
+  background: rgba(0, 0, 0, 0.48);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 5px 9px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  word-break: break-word;
+  font-size: 11px;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
 }
 
 .a-enter-vr-button {
