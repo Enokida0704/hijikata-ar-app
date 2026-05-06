@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="./style.css" />
 
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://unpkg.com/aframe-chromakey-material/dist/aframe-chromakey-material.min.js"></script>
+    <script src="./chromakey-shader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <script src="./app.js" defer></script>
   </head>
@@ -56,7 +56,7 @@
 
         <a-entity
           id="spawnRoot"
-          position="0.75 -0.25 0.25"
+          position="0 0 0.28"
           scale="0.001 0.001 0.001"
           visible="false"
         >
@@ -85,11 +85,13 @@
             position="0 0.08 0"
             visible="false"
             material="
-              shader: chromakey;
+              shader: soft-chromakey;
               src: #hijikataVideo;
-              color: 0.13 0.46 0.32;
-              side: double;
-              transparent: true;
+              keyColor: #20904f;
+              similarity: 0.16;
+              smoothness: 0.05;
+              spill: 0.08;
+              alphaTest: 0.03;
             "
           ></a-plane>
         </a-entity>
