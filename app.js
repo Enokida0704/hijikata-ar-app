@@ -39,8 +39,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const resetPose = () => {
     clearAnimations();
 
-    // HTML側の初期位置と揃える
-    spawnRoot.setAttribute("position", "0.75 -0.25 0.25");
+    // HTML側の初期位置と揃える。ラベル中心の手前に表示する。
+    spawnRoot.setAttribute("position", "0 0 0.28");
     spawnRoot.setAttribute("scale", "0.001 0.001 0.001");
     spawnRoot.setAttribute("visible", false);
 
