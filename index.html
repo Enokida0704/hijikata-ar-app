@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Toshizou Toast AR MVP</title>
     <link rel="stylesheet" href="./style.css" />
+
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-chromakey-material/dist/aframe-chromakey-material.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <script src="./app.js" defer></script>
   </head>
+
   <body>
     <div class="overlay" id="overlay">
       <div class="panel">
@@ -19,6 +22,7 @@
           <li>ラベルを明るい場所で正面気味に映す</li>
         </ol>
         <button id="startButton">ARを開始</button>
+        <div id="debugStatus" class="debug-status"></div>
       </div>
     </div>
 
@@ -30,7 +34,16 @@
       device-orientation-permission-ui="enabled: false"
     >
       <a-assets timeout="3000">
-        <video id="hijikataVideo" src="./assets/hijikata_beer_green_background.mp4" loop muted playsinline webkit-playsinline crossorigin="anonymous"></video>
+        <video
+          id="hijikataVideo"
+          src="./assets/hijikata_beer_green_background.mp4"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          crossorigin="anonymous"
+        ></video>
+
         <img id="smokeImg" src="./assets/smoke.png" />
         <img id="glowImg" src="./assets/glow.png" />
       </a-assets>
@@ -41,12 +54,44 @@
         <a-entity light="type: ambient; intensity: 1.15"></a-entity>
         <a-entity light="type: directional; intensity: 0.8" position="0 1 1"></a-entity>
 
-        <a-entity id="spawnRoot" position="0.75 -0.25 0.25" scale="0.001 0.001 0.001" visible="false">
-          <a-image id="smoke" src="#smokeImg" width="1.5" height="1.1" position="0 -0.05 -0.06" opacity="0"></a-image>
-          <a-image id="glow" src="#glowImg" width="1.25" height="1.25" position="0 0.06 -0.05" opacity="0"></a-image>
+        <a-entity
+          id="spawnRoot"
+          position="0.75 -0.25 0.25"
+          scale="0.001 0.001 0.001"
+          visible="false"
+        >
+          <a-image
+            id="smoke"
+            src="#smokeImg"
+            width="1.5"
+            height="1.1"
+            position="0 -0.05 -0.06"
+            opacity="0"
+          ></a-image>
 
-          <a-plane id="character" material="shader: chromakey; src: #hijikataVideo; color: #217552; similarity: 0.10; smoothness: 0.08; spill: 0.18; opacity: 0; repeat: 1 0.88; offset: 0 0.12" width="0.82" height="1.28" position="0 0.08 0"></a-plane>
+          <a-image
+            id="glow"
+            src="#glowImg"
+            width="1.25"
+            height="1.25"
+            position="0 0.06 -0.05"
+            opacity="0"
+          ></a-image>
 
+          <a-plane
+            id="character"
+            width="0.82"
+            height="1.28"
+            position="0 0.08 0"
+            visible="false"
+            material="
+              shader: chromakey;
+              src: #hijikataVideo;
+              color: 0.13 0.46 0.32;
+              side: double;
+              transparent: true;
+            "
+          ></a-plane>
         </a-entity>
       </a-entity>
     </a-scene>
