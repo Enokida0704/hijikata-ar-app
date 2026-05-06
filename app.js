@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const smoke = document.getElementById("smoke");
   const glow = document.getElementById("glow");
   const hijikataVideo = document.getElementById("hijikataVideo");
-  const debugStatus = document.getElementById("debugStatus");
 
   let started = false;
   let active = false;
@@ -16,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const setDebug = (message) => {
     console.log("[AR DEBUG]", message);
-    if (debugStatus) debugStatus.textContent = `debug: ${message}`;
   };
 
   const setStartButtonState = (enabled, label) => {
