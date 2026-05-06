@@ -1,10 +1,28 @@
 AFRAME.registerShader("chromakey", {
   schema: {
     src: { type: "map", is: "uniform" },
-    color: { type: "color", default: "#1f6f50" },
-    similarity: { type: "number", default: 0.10 },
-    smoothness: { type: "number", default: 0.08 },
-    spill: { type: "number", default: 0.18 },
+    color: { type: "color", is: "uniform", default: "#217552" },
+    similarity: { type: "number", is: "uniform", default: 0.10 },
+    smoothness: { type: "number", is: "uniform", default: 0.08 },
+    spill: { type: "number", is: "uniform", default: 0.18 },
+    opacity: { type: "number", is: "uniform", default: 1.0 },
+  },
+
+  update: function (data) {
+    const materialData = this.el.components.material.data;
+    materialData.transparent = true;
+    materialData.depthWrite = false;
+    materialData.alphaTest = 0.01;
+    materialData.side = "double";
+
+    this.material.transparent = true;
+    this.material.depthWrite = false;
+    this.material.alphaTest = 0.01;
+    this.material.side = THREE.DoubleSide;
+
+    if (this.material.uniforms.opacity) {
+      this.material.uniforms.opacity.value = data.opacity;
+    }
   },
 
   vertexShader: [
@@ -22,6 +40,7 @@ AFRAME.registerShader("chromakey", {
     "uniform float similarity;",
     "uniform float smoothness;",
     "uniform float spill;",
+    "uniform float opacity;",
     "varying vec2 vUV;",
     "vec2 rgbToCbCr(vec3 c) {",
     "  float cb = -0.168736 * c.r - 0.331264 * c.g + 0.5 * c.b;",
@@ -35,18 +54,18 @@ AFRAME.registerShader("chromakey", {
     "  float chromaDistance = distance(videoCbCr, keyCbCr);",
     "  float chromaAlpha = smoothstep(similarity, similarity + smoothness, chromaDistance);",
     "  float greenDominance = videoColor.g - max(videoColor.r, videoColor.b);",
-    "  float greenMask = smoothstep(0.03, 0.18, greenDominance);",
+    "  float greenMask = smoothstep(0.03, 0.12, greenDominance);",
     "  float alpha = mix(1.0, chromaAlpha, greenMask);",
     "  vec3 despilled = videoColor.rgb;",
     "  float spillAmount = (1.0 - alpha) * spill;",
     "  despilled.g = mix(despilled.g, (despilled.r + despilled.b) * 0.5, spillAmount);",
-    "  gl_FragColor = vec4(despilled, videoColor.a * alpha);",
+    "  gl_FragColor = vec4(despilled, videoColor.a * alpha * opacity);",
     "}",
   ].join("\n"),
 });
 
 // chromakey / similarity / smoothness: 素材ごとに値を調整して境界品質を最適化する。
-// 例: color は #1f6f50 のように素材の実背景色へ合わせて指定する。
+// 例: color は #217552 のように素材の実背景色へ合わせて指定する。
 
 document.addEventListener("DOMContentLoaded", () => {
   const overlay = document.getElementById("overlay");
@@ -81,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
     clearAnimations();
     spawnRoot.setAttribute("position", "0.0 -0.2 0.18");
     spawnRoot.setAttribute("scale", "0.001 0.001 0.001");
-    character.setAttribute("opacity", 0);
+    character.setAttribute("material", "opacity", 0);
     smoke.setAttribute("opacity", 0);
     glow.setAttribute("opacity", 0);
     character.setAttribute("rotation", "0 0 0");
@@ -98,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     spawnRoot.setAttribute("animation__spawn", "property: scale; from: 0.001 0.001 0.001; to: 0.68 0.68 0.68; dur: 460; easing: easeOutBack");
-    character.setAttribute("animation__fadein", "property: opacity; from: 0; to: 1; dur: 360; easing: easeOutQuad");
+    character.setAttribute("animation__fadein", "property: material.opacity; from: 0; to: 1; dur: 360; easing: easeOutQuad");
     smoke.setAttribute("animation__smokein", "property: opacity; from: 0; to: 0.62; dur: 320; easing: easeOutQuad");
     glow.setAttribute("animation__glowin", "property: opacity; from: 0; to: 0.65; dur: 450; easing: easeOutQuad");
   };
